@@ -8,6 +8,6 @@ ailleurs très bien optimisé pour du [reverse-proxy](https://fr.wikipedia.org/w
 2. Configuration primaire du site web
 3. Installation de acme.sh
     1. Installation de acme.sh
-    2. jaaj
+    2. Enregistrement auprès de l'autorité de certification
 4. Récupération des clefs d'API OVH
-5. 
+5. Génération des certificats
