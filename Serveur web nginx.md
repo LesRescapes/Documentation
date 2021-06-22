@@ -3,6 +3,8 @@
   - [Préface](#préface)
   - [Mise en place du système](#mise-en-place-du-système)
   - [Installation de NGINX et de PHP-FPM](#installation-de-nginx-et-de-php-fpm)
+    - [Dnf et les modules](#dnf-et-les-modules)
+  - [Configuration primaire du site web](#configuration-primaire-du-site-web)
 ## Préface
 [Nginx](https://fr.wikipedia.org/wiki/NGINX) est un serveur web très populaire dans le domaine du cloud pour sa meilleure
 gestion des fortes charges et pour sa configuration très modulable (il est par
@@ -28,4 +30,21 @@ Dans le cas où vous êtes connecté à un utilisateur non root, mais ayant les 
 commande précédée de `sudo`.
 
 ## Installation de NGINX et de PHP-FPM
+
+Avant d'installer les paquets, une courte notion sur les modules de dnf.
+
+### Dnf et les modules
+
+Dnf permet d'installer différentes versions d'un même paquet. Par défaut, c'est la version encore maintenue la plus mature
+et déployée qui est installée. Afin de s'assurer qu'il s'agisse de la dernière version de Nginx qui est installée, exécuter les
+commandes suivantes dans le terminal :
+
+`dnf module nginx switch-to 1.18`
+
+`dnf install nginx:1.18 -y`
+
+Ensuite, l'installation de PHP-FPM est très aisée, car il n'y a pas de modules pour cette dernière.
+Exécutez la commande `dnf install php-fpm -y`
+
+## Configuration primaire du site web
 
