@@ -9,14 +9,6 @@ PHP-FPM est le module permettant au serveur web Nginx d'exécuter des pages cod�
 
 Le [CAA](https://fr.wikipedia.org/wiki/DNS_Certification_Authority_Authorization) est un type d'enregistrement DNS
 permettant à ces derniers de lister les Autorités de Certification (CA) pouvant délivrer un certificat au nom de domaine correspondant.
-## Table des matières
-1. Installation de NGINX et de PHP-FPM
-2. Configuration primaire du site web
-3. Récupération des clefs d'API OVH
-4. Acme.sh
-    1. Installation
-    2. Enregistrement auprès de l'autorité de certification
-    3. Génération des certificats
-5. Configuration définitive du site web
-6. Configuration définitive d'NGINX
-7. Configuration du CAA
+
+- [Serveur web Nginx](#serveur-web-nginx)
+  - [Préface](#préface)
