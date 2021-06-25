@@ -74,4 +74,4 @@ non-root mais ayant les permissions sudo.
 Enfin, dans le fichier de configuration, descendre plus bas jusqu'à trouver le blox "http", puis ajouter la ligne `include /etc/nginx/sites/*;`. N'oubliez pas la tabulation,
 comme suit sur l'image ci-dessous :
 
-![](images/conf_nginx.png)
+<center>![](images/conf_nginx.png)</center>
