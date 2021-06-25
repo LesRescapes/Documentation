@@ -48,3 +48,8 @@ Exécutez la commande `dnf install php-fpm -y`
 
 ## Configuration primaire du site web
 
+Avant d'avoir un serveur web parfaitement fonctionnel et sécurisé avec l'HTTPS, on va d'abord poser la base du serveur
+web sur lequel nous allons héberger notre site. Dans notre exemple, il s'agit du site du serveur GTA RP Les Rescapés RP.
+
+Les configurations des sites et des hôtes virtuels d'Nginx sont localisés dans test
+: jaaj
