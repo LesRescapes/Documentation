@@ -75,3 +75,10 @@ Enfin, dans le fichier de configuration, descendre plus bas jusqu'à trouver le 
 comme suit sur l'image ci-dessous :
 
 ![](images/conf_nginx.png)
+
+Sauvegarder le fichier en pressant les touches ctrl et x, pressez la touche y pour confirmer, puis entrée pour valider. Le fichier de configuration d'Nginx édité, il va falloir
+que ce dernier prenne en compte la modification. Mais avant toute chose, il est toujours préférable de demander à Nginx de vérifier si le fichier de configuration fraîchement
+modifé est correct et ne comporte pas d'erreurs. Pour cela, rentrer dans le terminal la commande `nginx -t`, puis Nginx vous dira si le fichier est valide où s'il comporte
+une ou des erreurs, et vous dira même où !. Dans notre cas, la modification n'étant pas très poussée, tout devrait bien se passer.
+
+Ainsi, nous pouvons demander à Nginx de recharger son fichier de configuration avec `nginx -s reload`.
