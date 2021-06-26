@@ -39,9 +39,11 @@ Dnf permet d'installer différentes versions d'un même paquet. Par défaut, c'e
 et déployée qui est installée. Afin de s'assurer qu'il s'agisse de la dernière version de Nginx qui est installée, exécuter les
 commandes suivantes dans le terminal :
 
-`dnf module nginx switch-to 1.18`
+```bash
+dnf module nginx switch-to 1.18
 
-`dnf install nginx:1.18 -y`
+dnf install nginx:1.18 -y
+```
 
 Ensuite, l'installation de PHP-FPM est très aisée, car il n'y a pas de modules pour cette dernière.
 Exécutez la commande `dnf install php-fpm -y`
@@ -82,3 +84,5 @@ modifé est correct et ne comporte pas d'erreurs. Pour cela, rentrer dans le ter
 une ou des erreurs, et vous dira même où !. Dans notre cas, la modification n'étant pas très poussée, tout devrait bien se passer.
 
 Ainsi, nous pouvons demander à Nginx de recharger son fichier de configuration avec `nginx -s reload`.
+
+Désormais, nous pouvons créer
