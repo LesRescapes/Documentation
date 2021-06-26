@@ -5,6 +5,7 @@
   - [Installation de NGINX et de PHP-FPM](#installation-de-nginx-et-de-php-fpm)
     - [Dnf et les modules](#dnf-et-les-modules)
   - [Configuration primaire du site web](#configuration-primaire-du-site-web)
+  - [Récupération des clefs d'API OVH](#récupération-des-clefs-dapi-ovh)
 ## Préface
 [Nginx](https://fr.wikipedia.org/wiki/NGINX) est un serveur web très populaire dans le domaine du cloud pour sa meilleure gestion des fortes charges et pour sa configuration très modulable (il est par ailleurs très bien optimisé pour du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse)).
 
@@ -62,3 +63,34 @@ Désormais, nous pouvons créer le fichier de configuration de notre site web. G
 - De définir la localisation des fichiers de notre site (ici `/var/www/lesrescapesrp.fr`, qui est un répertoire que l'on va créer)
 - Lui donner des noms d'hôte, qui servira plus tard notamment en ce qui est matière de certificats.
 - Le tout de fonctionner sur le port 80, qui est le port par défaut pour de l'HTTP.
+
+De ce fait, nous allons créer le fichier de configuration de notre site web avec `nano sites/lesrescapesrp.fr` (n'oubliez pas le sudo avant si vous n'êtes pas sur l'utilisateur root, mais n'oubliez pas également de nommer votre fichier de site en fonction de vos besoins. Il est courant de nommer le fichier de configuration de votre site avec le nom d'hôte qui va lui être attribué). Enfin, copiez la configuration suivante dans votre éditeur de texte :
+```nginx configuration
+server {
+    listen 80; # Ici on demande à Nginx d'écouter le port sur toutes les adresses IPv4 de toutes les interfaces réseau.
+    listen [::]:80; # Idem, mais avec les IPv6 de toutes les interfaces réseau.
+
+    server_name lesrescapesrp.fr www.lesrescapesrp.fr; # On donne deux noms d'hôtes à notre site, car certains navigateurs "forcent" l'utilisation du préfixe www.
+
+    root /var/www/lesrescapesrp.fr; # La localisation de nos fichiers de site web. Notes que "lesrescapesrp.fr" est un répertoire et non un fichier.
+
+    location / {
+      index index.html index.php;
+    } # Ce bloc ordonne à Nginx, lorsqu'une requête s'adresse à ce serveur web, de retourner en priorité, dans la conditions où ils existent, les fichiers index.html et index.php.
+}
+```
+Évidemment, changez les paramètres dans ce fichier selon vos besoins. Ensuite, il est de coutume de toujours tester nos fichiers de configuration Nginx après avoir opéré à un quelconque changement, avec `nginx -t`. Comme précédemment, si cette commande vous renvoie des erreurs, vérifiez votre configuration. Dans le cas contraire, nous pouvons demander à Nginx de recharger les fichiers de configuration en mémoire pour qu'il prenne en compte les changements avec `nginx -s reload`.
+
+Si le répertoire dans `/var/www` cité plus haut n'est toujours pas créé, faites-le toujours avec la commande mkdir, dans notre cas `mkdir /var/www/lesrescapesrp.fr`. Rappel : dans cette commande, nous mettons le chemin dit absolu du répertoire car pour rappel, nous travaillons toujours présentement dans le répertoire `/etc/nginx` et y resterons dans le sens où nous nous allons être ammenés à éditer à nouveau les configurations d'Nginx plus tard. 2e rappel : adaptez la création de votre répertoire de site en fonction de ce que vous avez précédemment convenu dans le fichier de configuration de votre site.
+
+Enfin, vous pouvez, au choix :
+- Directement ajouter vos fichiers de site dans le répertoire nouvellement créé, auquel cas passez par le protocole SFTP qui est non seulement plus sûr mais également plus simple d'utilisation
+- Ou alors créer un bref fichier html dans ce répertoire : `nano /var/www/lesrescapesrp.fr/index.html` dans lequel ce dernier contient la seule et unique ligne `<h1>test</h1>`.
+
+Enfin, vous pouvez tester votre site en entrant dans la barre d'URL de votre navigateur l'adresse IP de votre serveur. Normalement, votre navigateur devrait, en fonction de ce que vous avez fait, soit vous renvoyer votre site, soit vous renvoyer un "test" en gros et gras, en haut à gauche de votre fenêtre.
+
+## Récupération des clefs d'API OVH
+
+Un serveur web qui fonctionne et qui renvoie notre site, c'est bien. Mais devoir donner une adresse IP pour y accéder, c'est moins bien. Mais summum du firmament du comble de l'apogée de l'excès de la connerie à ne pas faire, surtout en 2021 là où ce qui suit est gratuit et facile à mettre en place, en plus de devenir "obligatoire" : laisser son site tourner en HTTP clair, et non en HTTPS, c'est pas seulement pas bien, c'est très moche, vous avez une place attibuée en enfer si vous laissez une chose pareille en production.
+
+Pour pallier ce problème, nous allons déployer des certificats sur notre serveur web. Notez que cette étape de "clefs d'API OVH" n'est nécessaire que dans le cas où vous souhaitez avoir des certificats supportant les wildcard (ex. *.lesrescapesrp.fr, pour avoir pleins de sous-domaines pouvant exploiter ces mêmes certificats). Prenez en compte que ce ne sont pas toutes les Autorités de Certifications qui peuvent délivrer gratuitement des certificats wildcard.
