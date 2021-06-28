@@ -106,6 +106,10 @@ Si vous ne comptez pas exploiter les certificats wildcard et que le port 80 est 
 
 Dans le cas où vous êtes propriétaire de plusieurs domaines, il peut-être pratique de créer une clef API unique permettant de faire des challenge DNS pour tous les domaines: [création d'une clef d'API OVH](https://api.ovh.com/createToken/?GET=/domain/zone/*&POST=/domain/zone/*&PUT=/domain/zone/*&DELETE=/domain/zone/*/record/*).
 
-Cependant, créer une clef API unique par domaine, dont leurs droits sont restreintes au domaine est une bonne pratique de sécurité, car en cas de compromisation du serveur ou des clefs d'API, la casse est plus limitée, ces dernières ne pouvant interragir que dans une zone précise d'un domaine. Pour créer une clef API avec les droits restreints dans un domaine, copiez le lien suivant, en prenant soin de remplacer "votredomaine" par votre nom de domaine (exemple `lesrescapesrp.fr`) : `https://api.ovh.com/createToken/?GET=/domain/zone/votredomaine/*&POST=/domain/zone/votredomaine/*&PUT=/domain/zone/votredomaine/*&GET=/domain/zone/votredomaine&DELETE=/domain/zone/votredomaine/record/*`. Vous devez obtenir un truc de ce genre : ![](images/exemple_clefs_api.png)
+Cependant, créer une clef API unique par domaine, dont leurs droits sont restreintes au domaine est une bonne pratique de sécurité, car en cas de compromisation du serveur ou des clefs d'API, la casse est plus limitée, ces dernières ne pouvant interragir que dans une zone précise d'un domaine. Pour créer une clef API avec les droits restreints dans un domaine, copiez le lien suivant, en prenant soin de remplacer "votredomaine" par votre nom de domaine (exemple `lesrescapesrp.fr`) : `https://api.ovh.com/createToken/?GET=/domain/zone/votredomaine/*&POST=/domain/zone/votredomaine/*&PUT=/domain/zone/votredomaine/*&GET=/domain/zone/votredomaine&DELETE=/domain/zone/votredomaine/record/*`. Vous devez obtenir un truc de ce genre :
 
-Une fois créées, vous obtenez vos clefs d'API OVH comme ceci : ![](images/exemple_clefs_api.png). **Ne communiquez ces clefs à personne, ne les publiez nulle part sur Internet**. Car quiconque viens à avoir en sa possession ces clefs, **elle sera en mesure de détourner et d'usurper votre nom de domaine**.
+![](images/exemple_clefs_api.png)
+
+Une fois créées, vous obtenez vos clefs d'API OVH comme ceci : ![](images/exemple_clefs_api.png)
+
+**Ne communiquez ces clefs à personne, ne les publiez nulle part sur Internet**. Car quiconque viens à avoir en sa possession ces clefs, **elle sera en mesure de détourner et d'usurper votre nom de domaine**.
