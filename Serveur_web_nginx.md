@@ -8,6 +8,10 @@
   - [Récupération des clefs d'API OVH](#récupération-des-clefs-dapi-ovh)
     - [Avant toute chose](#avant-toute-chose)
     - [Création des clefs](#création-des-clefs)
+  - [Acme.sh](#acmesh)
+    - [Installation](#installation)
+    - [Enregistrement auprès de l'autorité de certification](#enregistrement-auprès-de-lautorité-de-certification)
+    - [Génération des certificats](#génération-des-certificats)
 ## Préface
 [Nginx](https://fr.wikipedia.org/wiki/NGINX) est un serveur web très populaire dans le domaine du cloud pour sa meilleure gestion des fortes charges et pour sa configuration très modulable (il est par ailleurs très bien optimisé pour du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse)).
 
@@ -114,4 +118,45 @@ Une fois créées, vous obtenez vos clefs d'API OVH comme ceci :
 
 ![](images/exemple_clefs_api.png)
 
-**Ne communiquez ces clefs à personne, ne les publiez nulle part sur Internet**. Car quiconque viens à avoir en sa possession ces clefs, **elle sera en mesure de détourner et d'usurper votre nom de domaine**.
+Notez ces clefs dans un endroit sûr, mais **ne communiquez ces clefs à personne, ne les publiez nulle part sur Internet**. Car quiconque viens à avoir en sa possession ces clefs, **elle sera en mesure de détourner et d'usurper votre nom de domaine**.
+
+## Acme.sh
+
+Pour générer des certificats avec les clefs d'API nouvellement acquises, nous allons utiliser [acme.sh](https://acme.sh). Acme.sh est un script écrit en bash permettant de générer des certificats au sein d'un terminal Linux en exploitant les protocoles standards ACME v1 et ACME v2.
+
+### Installation
+
+Si vous êtes toujours connecté à votre serveur Linux depuis l'installation et la configuration d'Nginx, faites en premier lieu un `cd ~`. Il est recommandé d'exécuter les commande d'acme.sh en tant qu'utilisateur root (et non en tant que simple utilisateur avec les permissions sudo) : `sudo su`. L'installation d'acme.sh est très aisée :
+```shell
+curl https://get.acme.sh | sh -s email=votre@email.com
+```
+N'oubliez pas de changer votre adresse email dans la commande avant de l'exécuter.
+
+### Enregistrement auprès de l'autorité de certification
+
+Par défaut, acme.sh, au même titre que tant d'autres script de génération de certificats comme certbot, génèrent des certificats de Let's Encrypt, qui est une Autorité de Certification américaine. Ils ont l'avantage de supporter le [wildcard](https://en.wikipedia.org/wiki/Wildcard_certificate) mais n'ont une durée de validité de seulement 3 mois. Également, la très grande majorité des sites web de particuliers et petites entreprises utilisent des certificats signés par Let's Encrypt qui, derrière, utilise la signature de quelques autres entreprises.
+
+Pour ce tutoriel, nous allons faire signer nos certificats par BuyPass, AC norvégienne qui propose également des certificats gratuits, ayant l'avantage d'avoir une validité de 6 mois (180 jours) et de n'exploiter qu'une seule entreprise en fond en plus d'elle pour signer ses certificats. Cependant, les certificats gratuits de BuyPass ne supportent pas le wildcard pour des mesures de sécurité (idem, un certificat wildcard, dans le cas où il se fait compromettre, peut permettre à une tierce personne d'usurper votre identité en créant des sous-domaines dans votre domaine).
+
+Nous allons ainsi s'enregistrer auprès de BuyPass avec la commande suivante :
+```bash
+acme.sh --server https://api.buypass.com/acme/directory --register-account  --accountemail votre@email.com
+```
+
+### Génération des certificats
+
+Une fois enregistrés, nous pouvons ajouter en variables système les clefs d'API OVH que nous avons précédemment créé. Pour cela, tapez dans votre terminal :
+```bash
+export OVH_AK="votre_application_key"
+export OVH_AS="votre_application_secret"
+export OVH_CK="votre_consumer_key"
+```
+Enfin, vous pouvez générer votre certificat avec la commande suivante :
+```bash
+acme.sh --server https://api.buypass.com/acme/directory --issue -d lesrescapesrp.fr -d www.lesrescapesrp.fr --days 170 --dns dns_ovh
+```
+Comme toujours, adaptez en fonction de vos besoins (notamment pour les domaines). Pour chaque domaine à ajouter sur le certificat (vous pouvez en mettre jusqu'à 5 dans le même certificat), ajoutez un -d suivi du domaine / sous-domaine. L'argument `--days 170` définit le délai avant la prochaine régénérartion de certificats. `--dns dns_ovh` indique à acme.sh la méthode à employer pour la génération de certificats, et chez quel registrar le domaine est enregistré.
+
+Patientez le temps que tout procède, cela pouvant prendre quelques longues minutes. Il est possible qu'une erreur (disant un champ txt ne pouvant être supprimé, de mémoire) peut survenir. Cela n'est pas très grave.
+
+Une fois que touta fini de mouliner, vos certificats sont générés ! (dans la condition où tout se passe bien, et que vous avez suivi le tuto à la lettre, en ayant pris soin de bien lire toutes les indications).
