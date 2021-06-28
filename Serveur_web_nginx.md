@@ -6,6 +6,8 @@
     - [Dnf et les modules](#dnf-et-les-modules)
   - [Configuration primaire du site web](#configuration-primaire-du-site-web)
   - [Récupération des clefs d'API OVH](#récupération-des-clefs-dapi-ovh)
+    - [Avant toute chose](#avant-toute-chose)
+    - [Création des clefs](#création-des-clefs)
 ## Préface
 [Nginx](https://fr.wikipedia.org/wiki/NGINX) est un serveur web très populaire dans le domaine du cloud pour sa meilleure gestion des fortes charges et pour sa configuration très modulable (il est par ailleurs très bien optimisé pour du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse)).
 
@@ -90,9 +92,20 @@ Enfin, vous pouvez, au choix :
 Enfin, vous pouvez tester votre site en entrant dans la barre d'URL de votre navigateur l'adresse IP de votre serveur. Normalement, votre navigateur devrait, en fonction de ce que vous avez fait, soit vous renvoyer votre site, soit vous renvoyer un "test" en gros et gras, en haut à gauche de votre fenêtre.
 
 ## Récupération des clefs d'API OVH
+### Avant toute chose
 
 Attention : cette étape est n'est pas nécessaire pour tout le monde. Veuillez cependant suivre les indications ci-dessous pour de plus amples informations.
 
 Un serveur web qui fonctionne et qui renvoie notre site, c'est bien. Mais devoir donner une adresse IP pour y accéder, c'est moins bien. Mais summum du firmament du comble de l'apogée de l'excès de la connerie à ne pas faire, surtout en 2021 là où ce qui suit est gratuit et facile à mettre en place, en plus de devenir "obligatoire" : laisser son site tourner en HTTP clair, et non en HTTPS, c'est pas seulement pas bien, c'est très moche, vous avez une place attibuée en enfer si vous laissez une chose pareille en production.
 
-Pour pallier ce problème, nous allons déployer des certificats sur notre serveur web. Notez que cette étape de "clefs d'API OVH" n'est nécessaire que dans le cas où vous souhaitez avoir des certificats supportant les wildcard (ex. *.lesrescapesrp.fr, pour avoir pleins de sous-domaines pouvant exploiter ces mêmes certificats). Prenez en compte que ce ne sont pas toutes les Autorités de Certifications qui peuvent délivrer gratuitement des certificats wildcard. Notez également que le "challenge" via DNS avec les clefs d'API OVH est une option dans le sens où le port 80 (HTTP) est inaccessible.
+Pour pallier ce problème, nous allons déployer des certificats sur notre serveur web. Notez que cette étape de "clefs d'API OVH" n'est nécessaire que dans le cas où vous souhaitez avoir des certificats supportant les wildcard (ex. *.lesrescapesrp.fr, pour avoir pleins de sous-domaines pouvant exploiter ces mêmes certificats), ou que le port 80 (HTTP) n'est pas exploitable pour délivrer un certificat par challenge HTTP. Prenez en compte que ce ne sont pas toutes les Autorités de Certifications qui peuvent délivrer gratuitement des certificats wildcard.
+
+Si vous ne comptez pas exploiter les certificats wildcard et que le port 80 est disponible, je vous invite de ce fait à utiliser le challenge HTTP en suivant le [tutoriel d'acme.sh](https://github.com/acmesh-official/acme.sh#2-just-issue-a-cert)
+
+### Création des clefs
+
+Dans le cas où vous êtes propriétaire de plusieurs domaines, il peut-être pratique de créer une clef API unique permettant de faire des challenge DNS pour tous les domaines: [création d'une clef d'API OVH](https://api.ovh.com/createToken/?GET=/domain/zone/*&POST=/domain/zone/*&PUT=/domain/zone/*&DELETE=/domain/zone/*/record/*).
+
+Cependant, créer une clef API unique par domaine, dont leurs droits sont restreintes au domaine est une bonne pratique de sécurité, car en cas de compromisation du serveur ou des clefs d'API, la casse est plus limitée, ces dernières ne pouvant interragir que dans une zone précise d'un domaine. Pour créer une clef API avec les droits restreints dans un domaine, copiez le lien suivant, en prenant soin de remplacer "votredomaine" par votre nom de domaine (exemple `lesrescapesrp.fr`) : `https://api.ovh.com/createToken/?GET=/domain/zone/votredomaine/*&POST=/domain/zone/votredomaine/*&PUT=/domain/zone/votredomaine/*&GET=/domain/zone/votredomaine&DELETE=/domain/zone/votredomaine/record/*`. Vous devez obtenir un truc de ce genre : ![](images/exemple_clefs_api.png)
+
+Une fois créées, vous obtenez vos clefs d'API OVH comme ceci : ![](images/exemple_clefs_api.png). **Ne communiquez ces clefs à personne, ne les publiez nulle part sur Internet**. Car quiconque viens à avoir en sa possession ces clefs, **elle sera en mesure de détourner et d'usurper votre nom de domaine**.
