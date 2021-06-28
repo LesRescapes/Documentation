@@ -108,8 +108,10 @@ Dans le cas où vous êtes propriétaire de plusieurs domaines, il peut-être pr
 
 Cependant, créer une clef API unique par domaine, dont leurs droits sont restreintes au domaine est une bonne pratique de sécurité, car en cas de compromisation du serveur ou des clefs d'API, la casse est plus limitée, ces dernières ne pouvant interragir que dans une zone précise d'un domaine. Pour créer une clef API avec les droits restreints dans un domaine, copiez le lien suivant, en prenant soin de remplacer "votredomaine" par votre nom de domaine (exemple `lesrescapesrp.fr`) : `https://api.ovh.com/createToken/?GET=/domain/zone/votredomaine/*&POST=/domain/zone/votredomaine/*&PUT=/domain/zone/votredomaine/*&GET=/domain/zone/votredomaine&DELETE=/domain/zone/votredomaine/record/*`. Vous devez obtenir un truc de ce genre :
 
-![](images/exemple_clefs_api.png)
+![](images/gen_clefs_api_ovh.png)
 
-Une fois créées, vous obtenez vos clefs d'API OVH comme ceci : ![](images/exemple_clefs_api.png)
+Une fois créées, vous obtenez vos clefs d'API OVH comme ceci :
+
+![](images/exemple_clefs_api.png)
 
 **Ne communiquez ces clefs à personne, ne les publiez nulle part sur Internet**. Car quiconque viens à avoir en sa possession ces clefs, **elle sera en mesure de détourner et d'usurper votre nom de domaine**.
