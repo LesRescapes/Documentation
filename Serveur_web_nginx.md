@@ -13,6 +13,7 @@
     - [Enregistrement auprès de l'autorité de certification](#enregistrement-auprès-de-lautorité-de-certification)
     - [Génération des certificats](#génération-des-certificats)
   - [Configuration définitive du site web](#configuration-définitive-du-site-web)
+  - [Configuration du CAA](#configuration-du-caa)
 ## Préface
 [Nginx](https://fr.wikipedia.org/wiki/NGINX) est un serveur web très populaire dans le domaine du cloud pour sa meilleure gestion des fortes charges et pour sa configuration très modulable (il est par ailleurs très bien optimisé pour du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse)).
 
@@ -232,3 +233,23 @@ Une fois la configuration copiée et modifiée à notre guise, on la sauvegarde,
 Nous pouvons ainsi demander à Nginx d'appliquer les changements faits avec `nginx -s reload`, et je vous invite à tester en chargeant votre page web :
 
 ![](images/exemple_https.png)
+
+## Configuration du CAA
+
+Dans le chapitre de la [génération des clefs d'API OVH](#création-des-clefs), nous avons vu une bonne pratique qui consiste à limiter la portée des permissions des clefs OVH. Ici, nous allons voir une bonne pratique similaire qui consiste à autoriser une ou plusieurs Autorités de Certification pouvant délivrer un certificat pour un ou plusieurs noms de domaines en exploitant la méthode DNS (voir chapitre sur [la création des certificats par méthode DNS](#génération-des-certificats)).
+
+Toujours, nous allons voir les étapes à faire depuis le pannel d'OVH. Pour ce qui est des autres opérateurs, la manipulation ne sera pas exactement la même, mais le principe est le même.
+
+Commencez par vous connecter à votre compte OVH sur le panneau. Cliquez sur l'onglet principal "Web Cloud", puis sur "Noms de domaine" dans la barre latérale gauche, sélectionnez votre NDD, puis allez dans la catégorie "Zone DNS".
+
+À droite, cliquez sur le bouton "ajouter une entrée" puis sélectionnez "CAA" dans la catégorie "Champs étendus". Puis remplissez comme suit :
+
+![](images/caa.png)
+
+Ceux qui ont décidé précédemment d'utiliser une autre AC (Autorité de Certification) telle que Let's Encrypt, je vous laisse deviner que le champ "Cible" doit avoir autre chose que buypass.com. Je vous donne ici ce qu'il faut mettre dans ce champ pour Let's Encrypt : `letsencrypt.org`. Et encore, je vous invite à consulter le site de [SSLMate](https://sslmate.com/caa/) qui vous permettra de déterminer automatiquement quoi remplir en fonction de votre AC.
+
+Une fois remplis, validez, et vous devez obtenir ceci dans votre panel OVH :
+
+![](images/ovh_panel.png)
+
+Notez qu'on retrouve notre champ TXT avec le ACME Challenge. Vous pouvez également ajouter un autre champ CAA de type "iodef" ainsi que votre email de contact, dans le cas où un certificat a été délivré par une AC n'ayant pas été autorisée dans la zone DNS comme nous venons de le faire.
