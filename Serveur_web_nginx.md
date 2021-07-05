@@ -12,6 +12,7 @@
     - [Installation](#installation)
     - [Enregistrement auprès de l'autorité de certification](#enregistrement-auprès-de-lautorité-de-certification)
     - [Génération des certificats](#génération-des-certificats)
+  - [Configuration définitive du site web](#configuration-définitive-du-site-web)
 ## Préface
 [Nginx](https://fr.wikipedia.org/wiki/NGINX) est un serveur web très populaire dans le domaine du cloud pour sa meilleure gestion des fortes charges et pour sa configuration très modulable (il est par ailleurs très bien optimisé pour du [reverse-proxy](https://fr.wikipedia.org/wiki/Proxy_inverse)).
 
@@ -160,3 +161,74 @@ Comme toujours, adaptez en fonction de vos besoins (notamment pour les domaines)
 Patientez le temps que tout procède, cela pouvant prendre quelques longues minutes. Il est possible qu'une erreur (disant un champ txt ne pouvant être supprimé, de mémoire) peut survenir. Cela n'est pas très grave.
 
 Une fois que touta fini de mouliner, vos certificats sont générés ! (dans la condition où tout se passe bien, et que vous avez suivi le tuto à la lettre, en ayant pris soin de bien lire toutes les indications).
+
+Les premiers certificats créés avec succès par acme.sh, ce dernier les renouvellera tous les 170 jours automatiquement comme un grand.
+
+## Configuration définitive du site web
+
+Nos certificats générés, nous devons configurer notre site web afin que ce dernier puisse exploiter les certificats nouvellement générés. Pour cela, nous allons modifier notre fichier de configuration de notre site web avec `nano /etc/nginx/sites/lesrescapesrp.fr`. Vous pouvez vous aider du [générateur de configurations de serveurs web de Mozilla](https://ssl-config.mozilla.org/#server=nginx&version=1.17.7&config=modern&openssl=1.1.1d&guideline=5.6), qui peut vous permettre de générer une configuration en fonction de votre serveur web et de la compatibilité que vous souhaitez donner à votre site web (comme par exemple le rendre accessible depuis des systèmes d'exploitations plus maintenus, comme Windows XP, ou le rendre accessible / compatible uniquement avec des navigateurs modernes, ce que je vous concerne pour la très grande majorité des cas). Le lien fourni précédemment vous permettra de générer une configuration de site web sous Nginx, pour des navigateurs modernes. Bien évidemment, vous devez éditer cette configuration générée afin à ce qu'elle puisse correspondre avec nos besoins :
+![](images/mozilla_ssl_conf_generator.png)
+
+De ce fait, notre configuration ressemble à ce qui suit :
+
+```nginx
+server {
+    listen 443 http2 ssl;
+    listen [::]:443 http2 ssl;
+
+    server_name lesrescapesrp.fr www.lesrescapesrp.fr;
+
+    access_log /var/log/nginx/lesrescapesrp.fr.access.log;
+    error_log /var/log/nginx/lesrescapesrp.fr.error.log;
+
+    ssl_certificate /root/.acme.sh/lesrescapesrp.fr/fullchain.cer;
+    ssl_certificate_key /root/.acme.sh/lesrescapesrp.fr/lesrescapesrp.fr.key;
+    # Modifiez les chemins d'accès à vos clefs en fonction de vos besoins.
+	
+	  ssl_session_timeout 1d;
+    ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
+    ssl_session_tickets off;
+
+    ssl_prefer_server_ciphers off;
+	
+    add_header Strict-Transport-Security "max-age=63072000" always;
+	
+    ssl_stapling on;
+    ssl_stapling_verify on;
+	
+    ssl_trusted_certificate /root/.acme.sh/lesrescapesrp.fr/ca.cer;
+
+    # gzip_types html css jpeg png ico;
+    # Cette ligne est parfaitement optionelle. Dans notre cas, elle permet de mettre en cache les fichiers au format html, css, jpeg, png et ico,
+    # afin que le serveur puisse réduire les accès disques pour délivrer plus rapidement ces fichiers aux clients qui le demandent.
+    # Décommentez-la pour l'exploiter
+
+    location / {
+      index index.html index.php;
+    }
+	
+    # location ~ \.php$	{
+    #	include snippets/fastcgi-php.conf;
+    #	fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+    # }
+    # Ce bloc de code est nécessaire dans le cas où votre site web contient des pages en PHP, et que ces dernières ne fonctionnent pas.
+
+    root /var/www/lesrescapesrp.fr;
+	
+    #error_page 404 /404.php;
+    #error_page 403 /403.php;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name lesrescapesrp.fr www.lesrescapesrp.fr;
+    return 301 https://$server_name$request_uri;
+}
+```
+
+Une fois la configuration copiée et modifiée à notre guise, on la sauvegarde, puis nous demandons à Nginx de certifier la validité du fichier de configuration avec `nginx -t`. Toujours dans le cas où vous avez bien suivi ce tutoriel à la lettre, et que vous avez pris le temps de tout bien comprendre comment c'est fait, il ne devrait pas y avoir de problèmes. Auquel cas, Nginx vous le dira.
+
+Nous pouvons ainsi demander à Nginx d'appliquer les changements faits avec `nginx -s reload`, et je vous invite à tester en chargeant votre page web :
+
+![](images/exemple_https.png)
